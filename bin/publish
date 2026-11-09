@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use StreamForge\Event\Event;
+use StreamForge\StreamForge;
+
+$topic = $argv[1] ?? 'orders.v1';
+$type = $argv[2] ?? 'order.created';
+$dataJson = $argv[3] ?? '{"order_id":"ord-demo","amount":99.95,"customer_id":"cust-1"}';
+$key = $argv[4] ?? 'ord-demo';
+
+$brokers = explode(',', getenv('KAFKA_BROKERS') ?: '127.0.0.1:9092');
+$data = json_decode($dataJson, true, 512, JSON_THROW_ON_ERROR);
+
+$event = Event::create(
+    type: $type,
+    source: 'php-cli-publisher',
+    data: $data,
+    key: $key
+);
+
+$producer = StreamForge::createProducer(['brokers' => $brokers]);
+$producer->publish($topic, $event);
+$producer->close();
+
+echo "Event published successfully!\n";
+echo "• Topic: {$topic}\n";
+echo "• Event ID: {$event->id}\n";
+echo "• Type: {$event->type}\n";
+echo "• Key: {$event->key}\n";

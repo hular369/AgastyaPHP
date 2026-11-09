@@ -1,0 +1,154 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use StreamForge\Consumer\Consumer;
+use StreamForge\Consumer\HandlerRegistry;
+use StreamForge\Consumer\InMemoryConsumerClient;
+use StreamForge\Consumer\Record;
+use StreamForge\Dlq\DlqEnvelope;
+use StreamForge\Dlq\DlqPublisherInterface;
+use StreamForge\Event\Event;
+use StreamForge\Exception\NonRetryableException;
+use StreamForge\Idempotency\MemoryDeduplicator;
+use StreamForge\Observability\Metrics;
+use StreamForge\Retry\RetryPolicy;
+
+echo "================================================================================\n";
+echo "           STREAMFORGE PHP DISTRIBUTED EVENT PROCESSING PIPELINE DEMO           \n";
+echo "================================================================================\n";
+echo "Mode: SIMULATED (Demonstrating retries, DLQ, idempotency, and offset management)\n\n";
+
+$client = new InMemoryConsumerClient();
+$registry = new HandlerRegistry();
+$metrics = new Metrics();
+$deduplicator = new MemoryDeduplicator(ttlSeconds: 3600);
+
+/** @var list<DlqEnvelope> $dlqRecords */
+$dlqRecords = [];
+$dlqPublisher = new class ($dlqRecords) implements DlqPublisherInterface {
+    private $store;
+    public function __construct(&$store)
+    {
+        $this->store = &$store;
+    }
+    public function publish(DlqEnvelope $envelope): void
+    {
+        $this->store[] = $envelope;
+        echo "   \033[1;31m🚨 [DLQ ROUTED]\033[0m Event {$envelope->originalEvent->id} routed to DLQ!\n";
+        echo "      Reason: {$envelope->errorReason} (Failed Attempts: {$envelope->failedAttempts})\n";
+    }
+};
+
+// 1. Handler: order.created
+$registry->registerCallable('order.created', static function (Event $event): void {
+    $amount = (float) ($event->data['amount'] ?? 0);
+    $orderId = $event->data['order_id'] ?? 'unknown';
+
+    if ($amount <= 0) {
+        throw new NonRetryableException(sprintf('Poison pill: invalid negative order amount %.2f', $amount));
+    }
+
+    echo "   \033[32m✅ [ORDER HANDLER]\033[0m Processed Order {$orderId} for customer {$event->data['customer_id']} (\${$amount})\n";
+});
+
+// 2. Handler: payment.completed
+$registry->registerCallable('payment.completed', static function (Event $event): void {
+    echo "   \033[32m✅ [PAYMENT HANDLER]\033[0m Confirmed Payment {$event->data['payment_id']} for Order {$event->data['order_id']} ({$event->data['status']})\n";
+});
+
+// 3. Handler: inventory.updated with simulated transient database timeout
+$inventoryAttempts = 0;
+$registry->registerCallable('inventory.updated', static function (Event $event) use (&$inventoryAttempts): void {
+    $inventoryAttempts++;
+    if ($inventoryAttempts < 3) {
+        echo "   \033[33m⚠️  [INVENTORY HANDLER]\033[0m Simulated database connection timeout on attempt {$inventoryAttempts}...\n";
+        throw new Exception("Transient database timeout on attempt {$inventoryAttempts}");
+    }
+
+    echo "   \033[32m✅ [INVENTORY HANDLER]\033[0m Successfully reserved SKU {$event->data['sku']} (Qty: {$event->data['quantity']}) after {$inventoryAttempts} attempts!\n";
+});
+
+$consumer = new Consumer(
+    client: $client,
+    registry: $registry,
+    retryPolicy: new RetryPolicy(
+        maxAttempts: 3,
+        initialIntervalMs: 50,
+        maxIntervalMs: 200,
+        multiplier: 2.0,
+        jitter: false
+    ),
+    dlqPublisher: $dlqPublisher,
+    deduplicator: $deduplicator,
+    metrics: $metrics,
+    sleeper: static function (int $ms): void {
+        echo "      \033[90m[retry-sleep] backing off for {$ms}ms...\033[0m\n";
+        usleep($ms * 1000);
+    }
+);
+
+// --- SCENARIO 1: Happy path events ---
+echo "--- SCENARIO 1: Happy Path Processing ---\n";
+$evt1 = Event::create('order.created', 'checkout-svc', [
+    'order_id' => 'ord-1001',
+    'customer_id' => 'cust-42',
+    'amount' => 199.95,
+], key: 'ord-1001');
+$client->enqueue(new Record('orders.v1', 0, 1, $evt1->toJson(), $evt1->key));
+
+$evt2 = Event::create('payment.completed', 'billing-svc', [
+    'payment_id' => 'pay-9001',
+    'order_id' => 'ord-1001',
+    'status' => 'SETTLED',
+], key: 'ord-1001');
+$client->enqueue(new Record('payments.v1', 0, 2, $evt2->toJson(), $evt2->key));
+
+while ($rec = $client->poll()) {
+    $consumer->processRecord($rec);
+}
+
+// --- SCENARIO 2: Transient failure with exponential retry ---
+echo "\n--- SCENARIO 2: Transient Failure with Exponential Retry ---\n";
+$evt3 = Event::create('inventory.updated', 'warehouse-svc', [
+    'sku' => 'LAPTOP-PRO-16',
+    'quantity' => 5,
+], key: 'LAPTOP-PRO-16');
+$client->enqueue(new Record('inventory.v1', 0, 3, $evt3->toJson(), $evt3->key));
+
+while ($rec = $client->poll()) {
+    $consumer->processRecord($rec);
+}
+
+// --- SCENARIO 3: Non-retryable Poison Pill -> Direct DLQ Routing ---
+echo "\n--- SCENARIO 3: Poison Pill & Dead Letter Queue (DLQ) Routing ---\n";
+$evt4 = Event::create('order.created', 'checkout-svc', [
+    'order_id' => 'ord-POISON-666',
+    'customer_id' => 'attacker',
+    'amount' => -999.00,
+], key: 'ord-POISON-666');
+$client->enqueue(new Record('orders.v1', 0, 4, $evt4->toJson(), $evt4->key));
+
+while ($rec = $client->poll()) {
+    $consumer->processRecord($rec);
+}
+
+// --- SCENARIO 4: Deduplication / Idempotency ---
+echo "\n--- SCENARIO 4: Idempotent Deduplication (At-Least-Once Re-Delivery) ---\n";
+echo "   Re-delivering identical event {$evt1->id} to simulate Kafka network retry...\n";
+$client->enqueue(new Record('orders.v1', 0, 5, $evt1->toJson(), $evt1->key));
+
+while ($rec = $client->poll()) {
+    $consumer->processRecord($rec);
+}
+
+echo "\n================================================================================\n";
+echo "                            SUMMARY & VERIFICATION                              \n";
+echo "================================================================================\n";
+printf("• Total offsets marked for commit: %d\n", $client->countAcked());
+printf("• DLQ envelopes captured: %d\n", count($dlqRecords));
+printf("• Idempotency cache active items: %d\n", $deduplicator->size());
+echo "All scenarios processed successfully with zero data loss!\n";

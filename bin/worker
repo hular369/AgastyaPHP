@@ -1,0 +1,71 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use StreamForge\Event\Event;
+use StreamForge\Exception\NonRetryableException;
+use StreamForge\StreamForge;
+
+$brokers = explode(',', getenv('KAFKA_BROKERS') ?: '127.0.0.1:9092');
+$groupId = getenv('KAFKA_GROUP_ID') ?: 'streamforge-php-workers';
+$topics = explode(',', getenv('KAFKA_TOPICS') ?: 'orders.v1,payments.v1,inventory.v1');
+$workerCount = (int) (getenv('WORKER_COUNT') ?: 4);
+
+echo "================================================================================\n";
+echo "                     STREAMFORGE PHP WORKER DAEMON                              \n";
+echo "================================================================================\n";
+echo "• Brokers: " . implode(', ', $brokers) . "\n";
+echo "• Group ID: {$groupId}\n";
+echo "• Topics: " . implode(', ', $topics) . "\n";
+echo "• Workers: {$workerCount}\n\n";
+
+$engine = StreamForge::create([
+    'brokers' => $brokers,
+    'group_id' => $groupId,
+    'topics' => $topics,
+    'workers' => $workerCount,
+    'retry' => [
+        'max_attempts' => 3,
+        'initial_interval_ms' => 100,
+        'max_interval_ms' => 2000,
+        'multiplier' => 2.0,
+        'jitter' => true,
+    ],
+    'dlq' => true,
+    'deduplication' => true,
+]);
+
+// Register Domain Handlers
+$engine->registerCallable('order.created', static function (Event $event): void {
+    $amount = (float) ($event->data['amount'] ?? 0);
+    if ($amount <= 0) {
+        throw new NonRetryableException("Invalid negative or zero order amount {$amount}");
+    }
+    echo sprintf("[%s] Processed order %s for customer %s ($%.2f)\n",
+        date('c'),
+        $event->data['order_id'] ?? 'unknown',
+        $event->data['customer_id'] ?? 'unknown',
+        $amount
+    );
+});
+
+$engine->registerCallable('payment.completed', static function (Event $event): void {
+    echo sprintf("[%s] Confirmed payment %s for order %s\n",
+        date('c'),
+        $event->data['payment_id'] ?? 'unknown',
+        $event->data['order_id'] ?? 'unknown'
+    );
+});
+
+$engine->registerCallable('inventory.updated', static function (Event $event): void {
+    echo sprintf("[%s] Updated inventory SKU %s (Qty: %d)\n",
+        date('c'),
+        $event->data['sku'] ?? 'unknown',
+        $event->data['quantity'] ?? 0
+    );
+});
+
+$engine->run();
