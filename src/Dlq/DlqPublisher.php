@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Dlq;
+namespace Agastya\Dlq;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

@@ -22,12 +22,12 @@ $passed = 0;
 $failed = 0;
 $failures = [];
 
-echo "\n\033[1;36mStreamForge PHP Test Runner\033[0m\n";
+echo "\n\033[1;36mAgastya PHP Test Runner\033[0m\n";
 echo str_repeat('=', 60) . "\n\n";
 
 foreach ($testFiles as $file) {
     require_once $file;
-    $className = 'StreamForge\\Tests\\Unit\\' . basename($file, '.php');
+    $className = 'Agastya\\Tests\\Unit\\' . basename($file, '.php');
 
     if (!class_exists($className)) {
         continue;

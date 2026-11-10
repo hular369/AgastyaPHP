@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
-use StreamForge\Observability\Metrics;
+use Agastya\Observability\Metrics;
 
 final class MetricsTest
 {
@@ -21,12 +21,12 @@ final class MetricsTest
 
         $output = $metrics->render();
 
-        assert(str_contains($output, 'streamforge_events_published_total'));
-        assert(str_contains($output, 'streamforge_events_consumed_total'));
-        assert(str_contains($output, 'streamforge_event_processing_duration_seconds'));
-        assert(str_contains($output, 'streamforge_event_retries_total'));
-        assert(str_contains($output, 'streamforge_dlq_events_total'));
-        assert(str_contains($output, 'streamforge_active_workers'));
+        assert(str_contains($output, 'agastya_events_published_total'));
+        assert(str_contains($output, 'agastya_events_consumed_total'));
+        assert(str_contains($output, 'agastya_event_processing_duration_seconds'));
+        assert(str_contains($output, 'agastya_event_retries_total'));
+        assert(str_contains($output, 'agastya_dlq_events_total'));
+        assert(str_contains($output, 'agastya_active_workers'));
         assert(str_contains($output, 'consumer_group="orders-group"} 4'));
     }
 }

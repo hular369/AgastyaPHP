@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Exception;
+namespace Agastya\Exception;
 
 use Throwable;
 
-class RetriesExhaustedException extends StreamForgeException
+class RetriesExhaustedException extends AgastyaException
 {
     public function __construct(
         string $message,

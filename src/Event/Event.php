@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Event;
+namespace Agastya\Event;
 
 use DateTimeImmutable;
 use DateTimeInterface;
 use JsonSerializable;
 use Ramsey\Uuid\Uuid;
-use StreamForge\Exception\ValidationException;
+use Agastya\Exception\ValidationException;
 
 /**
  * CloudEvents v1.0 compliant event envelope.

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Producer;
+namespace Agastya\Producer;
 
 use DateTimeInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use StreamForge\Event\Event;
-use StreamForge\Observability\Metrics;
+use Agastya\Event\Event;
+use Agastya\Observability\Metrics;
 use Throwable;
 
 final class Producer implements ProducerInterface

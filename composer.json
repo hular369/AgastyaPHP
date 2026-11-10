@@ -1,11 +1,11 @@
 {
-    "name": "raul369/php-event-processing-framework",
+    "name": "hular369/agastya",
     "description": "A production-grade distributed event processing framework in PHP with concurrent workers, configurable retries, dead-letter queues and Prometheus observability.",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "raul369",
+            "name": "hular369",
             "email": "hular369@gmail.com"
         }
     ],
@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "StreamForge\\": "src/"
+            "Agastya\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "StreamForge\\Tests\\": "tests/"
+            "Agastya\\Tests\\": "tests/"
         }
     },
     "scripts": {

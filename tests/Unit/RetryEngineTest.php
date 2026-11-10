@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
 use Exception;
-use StreamForge\Exception\NonRetryableException;
-use StreamForge\Exception\RetriesExhaustedException;
-use StreamForge\Retry\RetryEngine;
-use StreamForge\Retry\RetryPolicy;
+use Agastya\Exception\NonRetryableException;
+use Agastya\Exception\RetriesExhaustedException;
+use Agastya\Retry\RetryEngine;
+use Agastya\Retry\RetryPolicy;
 
 final class RetryEngineTest
 {

@@ -5,8 +5,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use StreamForge\Event\Event;
-use StreamForge\StreamForge;
+use Agastya\Event\Event;
+use Agastya\Agastya;
 
 $topic = $argv[1] ?? 'orders.v1';
 $type = $argv[2] ?? 'order.created';
@@ -23,7 +23,7 @@ $event = Event::create(
     key: $key
 );
 
-$producer = StreamForge::createProducer(['brokers' => $brokers]);
+$producer = Agastya::createProducer(['brokers' => $brokers]);
 $producer->publish($topic, $event);
 $producer->close();
 

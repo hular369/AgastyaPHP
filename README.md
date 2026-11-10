@@ -1,4 +1,4 @@
-# StreamForge PHP
+# Agastya PHP
 
 [![CI](https://github.com/raul369/php-event-processing-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/raul369/php-event-processing-framework/actions/workflows/ci.yml)
 [![PHP Version](https://img.shields.io/badge/php-%3E%3D%208.2-8892BF.svg)](https://php.net)
@@ -7,16 +7,16 @@
 
 > **A PHP-based distributed event processing framework with concurrent workers, configurable retries, dead-letter queues and Prometheus observability.**
 
-StreamForge is an extensible, reliable distributed event processing framework built in modern PHP (8.2+) for **Apache Kafka**. It bridges the gap between raw Kafka protocol clients and production operational concerns—providing concurrent multi-process worker pools, exponential backoff with jitter, dead-letter queue routing, idempotent deduplication, and Prometheus telemetry out-of-the-box.
+Agastya is an extensible, reliable distributed event processing framework built in modern PHP (8.2+) for **Apache Kafka**. It bridges the gap between raw Kafka protocol clients and production operational concerns—providing concurrent multi-process worker pools, exponential backoff with jitter, dead-letter queue routing, idempotent deduplication, and Prometheus telemetry out-of-the-box.
 
 ---
 
 ## Architecture Overview
 
 ```
-                   StreamForge Event Processing Pipeline (PHP)
+                   Agastya Event Processing Pipeline (PHP)
 
-  [Event Producers]                  [Apache Kafka Broker]                 [StreamForge Supervisor]
+  [Event Producers]                  [Apache Kafka Broker]                 [Agastya Supervisor]
 +-------------------+              +-----------------------+             +--------------------------+
 |  Applications     |              | Topics:               |             | Multi-Process Supervisor |
 |  REST APIs        |              |  • orders.v1          |             | (pcntl_fork Manager)     |
@@ -25,7 +25,7 @@ StreamForge is an extensible, reliable distributed event processing framework bu
           |                        +-----------------------+                          v
           v                                    |                         +--------------------------+
 +-------------------+                          v                         | Concurrent Child Workers |
-| StreamForge       | -----------> [Partition Broker] ----------->       |  • Worker PID 101        |
+| Agastya       | -----------> [Partition Broker] ----------->       |  • Worker PID 101        |
 | Publisher         |                                                    |  • Worker PID 102        |
 | (CloudEvents JSON)|                                                    +--------------------------+
 +-------------------+                                                                 |
@@ -95,7 +95,7 @@ make test
 ```
 Output:
 ```
-StreamForge PHP Test Runner
+Agastya PHP Test Runner
 ============================================================
 ConsumerTest
   ✔ testProcessRecordSuccess (3.56ms)
@@ -106,7 +106,7 @@ OK (25 tests, 25 passed) in 1007ms (Peak Memory: 4MB)
 ```
 
 ### 3. Run the E-Commerce Pipeline Simulation
-You can immediately experience the entire StreamForge pipeline **in-memory** without running Docker:
+You can immediately experience the entire Agastya pipeline **in-memory** without running Docker:
 
 ```bash
 make demo
@@ -114,7 +114,7 @@ make demo
 Output:
 ```
 ================================================================================
-           STREAMFORGE PHP DISTRIBUTED EVENT PROCESSING PIPELINE DEMO           
+           AGASTYA PHP DISTRIBUTED EVENT PROCESSING PIPELINE DEMO
 ================================================================================
 Mode: SIMULATED (Demonstrating retries, DLQ, idempotency, and offset management)
 
@@ -174,11 +174,11 @@ php bin/publish orders.v1 order.created '{"order_id":"ord-101","amount":150.00,"
 
 ### 1. Defining and Registering Event Handlers
 ```php
-use StreamForge\Event\Event;
-use StreamForge\Exception\NonRetryableException;
-use StreamForge\StreamForge;
+use Agastya\Event\Event;
+use Agastya\Exception\NonRetryableException;
+use Agastya\Agastya;
 
-$engine = StreamForge::create([
+$engine = Agastya::create([
     'brokers' => ['127.0.0.1:9092'],
     'group_id' => 'order-processors',
     'topics' => ['orders.v1'],
@@ -209,10 +209,10 @@ $engine->run();
 
 ### 2. Publishing Events
 ```php
-use StreamForge\Event\Event;
-use StreamForge\StreamForge;
+use Agastya\Event\Event;
+use Agastya\Agastya;
 
-$producer = StreamForge::createProducer([
+$producer = Agastya::createProducer([
     'brokers' => ['127.0.0.1:9092'],
 ]);
 
@@ -234,12 +234,12 @@ $producer->close();
 
 | Metric Name | Type | Labels | Description |
 |---|---|---|---|
-| `streamforge_events_published_total` | Counter | `topic`, `status` | Total count of published events |
-| `streamforge_events_consumed_total` | Counter | `topic`, `status` | Total count of consumed events by status (`success`, `corrupt`, `duplicate`, `unhandled`, `dlq`) |
-| `streamforge_event_processing_duration_seconds` | Histogram | `topic`, `event_type` | Handler latency histogram |
-| `streamforge_event_retries_total` | Counter | `topic`, `event_type` | Count of transient error retry attempts |
-| `streamforge_dlq_events_total` | Counter | `topic`, `reason` | Count of events routed to Dead Letter Queues |
-| `streamforge_active_workers` | Gauge | `consumer_group` | Current count of active worker processes |
+| `agastya_events_published_total` | Counter | `topic`, `status` | Total count of published events |
+| `agastya_events_consumed_total` | Counter | `topic`, `status` | Total count of consumed events by status (`success`, `corrupt`, `duplicate`, `unhandled`, `dlq`) |
+| `agastya_event_processing_duration_seconds` | Histogram | `topic`, `event_type` | Handler latency histogram |
+| `agastya_event_retries_total` | Counter | `topic`, `event_type` | Count of transient error retry attempts |
+| `agastya_dlq_events_total` | Counter | `topic`, `reason` | Count of events routed to Dead Letter Queues |
+| `agastya_active_workers` | Gauge | `consumer_group` | Current count of active worker processes |
 
 ---
 
@@ -277,7 +277,7 @@ For detailed engineering discussions and trade-off analyses:
 │   ├── Observability/        # Prometheus metrics collectors & exposition renderer
 │   ├── Producer/             # Pure-PHP Kafka publisher with CloudEvents header injection
 │   ├── Retry/                # Exponential backoff engine with full jitter
-│   └── StreamForge.php       # Central public framework facade & factory
+│   └── Agastya.php       # Central public framework facade & factory
 ├── tests/
 │   └── Unit/                 # Comprehensive unit test suite
 ├── .github/

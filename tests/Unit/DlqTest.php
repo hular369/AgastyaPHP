@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
-use StreamForge\Dlq\DlqEnvelope;
-use StreamForge\Dlq\DlqPublisher;
-use StreamForge\Event\Event;
+use Agastya\Dlq\DlqEnvelope;
+use Agastya\Dlq\DlqPublisher;
+use Agastya\Event\Event;
 
 final class DlqTest
 {

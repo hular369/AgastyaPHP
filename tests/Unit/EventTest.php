@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
 use DateTimeImmutable;
-use StreamForge\Event\Event;
-use StreamForge\Exception\ValidationException;
+use Agastya\Event\Event;
+use Agastya\Exception\ValidationException;
 
 final class EventTest
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Producer;
+namespace Agastya\Producer;
 
 use longlang\phpkafka\Producer\Producer as KafkaProducer;
 use longlang\phpkafka\Producer\ProducerConfig;
@@ -19,7 +19,7 @@ final class LonglangKafkaClient implements KafkaClientInterface
      */
     public function __construct(
         array $bootstrapServers = ['127.0.0.1:9092'],
-        string $clientId = 'streamforge-php-producer',
+        string $clientId = 'agastya-php-producer',
         ?LoggerInterface $logger = null
     ) {
         $this->logger = $logger ?? new NullLogger();

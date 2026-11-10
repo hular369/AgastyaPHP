@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
-use StreamForge\Event\Event;
-use StreamForge\Observability\Metrics;
-use StreamForge\Producer\InMemoryKafkaClient;
-use StreamForge\Producer\Producer;
+use Agastya\Event\Event;
+use Agastya\Observability\Metrics;
+use Agastya\Producer\InMemoryKafkaClient;
+use Agastya\Producer\Producer;
 
 final class ProducerTest
 {

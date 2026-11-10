@@ -1,4 +1,4 @@
-# Engineering Trade-Offs in StreamForge PHP
+# Engineering Trade-Offs in Agastya PHP
 
 Building distributed systems in PHP requires deliberate architectural decisions, especially when managing long-running processes, socket I/O, and consumer concurrency.
 
@@ -6,7 +6,7 @@ Building distributed systems in PHP requires deliberate architectural decisions,
 
 ## 1. Concurrency: Multi-Process (`pcntl_fork`) vs. Async Event Loops vs. Goroutines
 
-| Dimension | Multi-Process (`pcntl_fork`) (StreamForge Choice) | Async Event Loops (Swoole / ReactPHP / Fibers) | Go Goroutines / OS Threads |
+| Dimension | Multi-Process (`pcntl_fork`) (Agastya Choice) | Async Event Loops (Swoole / ReactPHP / Fibers) | Go Goroutines / OS Threads |
 |---|---|---|---|
 | **Memory Isolation** | **Complete**. Each child process has its own address space. A memory leak or fatal error in worker 1 does not crash worker 2. | Shared memory. A fatal crash or uncaught exception terminates the entire event loop. | Shared memory with lightweight scheduling (2KB stack). |
 | **Compatibility** | Standard PHP CLI with `ext-pcntl` and `ext-posix`. Zero third-party C-extensions required. | Requires custom PHP extensions (Swoole) or non-blocking driver rewrites (ReactPHP). | Native runtime feature of Go. |

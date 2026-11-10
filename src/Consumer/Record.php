@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Consumer;
+namespace Agastya\Consumer;
 
 final readonly class Record
 {

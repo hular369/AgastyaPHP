@@ -11,7 +11,7 @@ demo:
 	php bin/demo
 
 worker:
-	@echo "==> Starting StreamForge worker daemon..."
+	@echo "==> Starting Agastya worker daemon..."
 	php bin/worker
 
 docker-up:

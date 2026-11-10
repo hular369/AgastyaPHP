@@ -3,6 +3,6 @@ global:
   evaluation_interval: 5s
 
 scrape_configs:
-  - job_name: "streamforge-php-worker"
+  - job_name: "agastya-php-worker"
     static_configs:
       - targets: ["host.docker.internal:8081"]

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Consumer;
+namespace Agastya\Consumer;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use StreamForge\Observability\Metrics;
+use Agastya\Observability\Metrics;
 
 /**
  * Multi-process worker supervisor for concurrent event processing in PHP.
@@ -25,7 +25,7 @@ final class WorkerSupervisor
     public function __construct(
         private readonly int $workerCount,
         private $workerFactory,
-        private readonly string $consumerGroup = 'streamforge-php-group',
+        private readonly string $consumerGroup = 'agastya-php-group',
         private readonly ?Metrics $metrics = null,
         ?LoggerInterface $logger = null
     ) {
@@ -44,7 +44,7 @@ final class WorkerSupervisor
         $this->running = true;
         $this->registerSignals();
 
-        $this->logger->info('Starting StreamForge Worker Supervisor', [
+        $this->logger->info('Starting Agastya Worker Supervisor', [
             'supervisor_pid' => getmypid(),
             'worker_count' => $this->workerCount,
             'consumer_group' => $this->consumerGroup,

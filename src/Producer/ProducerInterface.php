@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Producer;
+namespace Agastya\Producer;
 
-use StreamForge\Event\Event;
+use Agastya\Event\Event;
 
 interface ProducerInterface
 {

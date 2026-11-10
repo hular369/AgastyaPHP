@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Consumer;
+namespace Agastya\Consumer;
 
-use StreamForge\Event\Event;
+use Agastya\Event\Event;
 
 interface HandlerInterface
 {

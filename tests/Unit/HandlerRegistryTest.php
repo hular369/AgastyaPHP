@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
-use StreamForge\Consumer\HandlerInterface;
-use StreamForge\Consumer\HandlerRegistry;
-use StreamForge\Event\Event;
-use StreamForge\Exception\StreamForgeException;
+use Agastya\Consumer\HandlerInterface;
+use Agastya\Consumer\HandlerRegistry;
+use Agastya\Event\Event;
+use Agastya\Exception\AgastyaException;
 
 final class HandlerRegistryTest
 {
@@ -63,7 +63,7 @@ final class HandlerRegistryTest
 
         try {
             $registry->registerCallable('', function (): void {});
-        } catch (StreamForgeException) {
+        } catch (AgastyaException) {
             $threw = true;
         }
 

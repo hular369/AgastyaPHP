@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Consumer;
+namespace Agastya\Consumer;
 
 use longlang\phpkafka\Consumer\ConsumeMessage;
 use longlang\phpkafka\Consumer\Consumer as KafkaConsumer;
@@ -24,9 +24,9 @@ final class LonglangConsumerClient implements ConsumerClientInterface
      */
     public function __construct(
         array $bootstrapServers = ['127.0.0.1:9092'],
-        string $groupId = 'streamforge-php-group',
-        array|string $topics = 'streamforge.events',
-        string $clientId = 'streamforge-php-consumer',
+        string $groupId = 'agastya-php-group',
+        array|string $topics = 'agastya.events',
+        string $clientId = 'agastya-php-consumer',
         ?LoggerInterface $logger = null
     ) {
         $this->logger = $logger ?? new NullLogger();

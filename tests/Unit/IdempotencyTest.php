@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
-use StreamForge\Exception\ValidationException;
-use StreamForge\Idempotency\MemoryDeduplicator;
+use Agastya\Exception\ValidationException;
+use Agastya\Idempotency\MemoryDeduplicator;
 
 final class IdempotencyTest
 {

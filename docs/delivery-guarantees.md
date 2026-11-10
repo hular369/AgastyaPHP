@@ -1,4 +1,4 @@
-# Delivery Guarantees & Consistency in StreamForge PHP
+# Delivery Guarantees & Consistency in Agastya PHP
 
 Distributed systems operate across asynchronous network boundaries. To build reliable systems, engineering teams must evaluate delivery guarantees with absolute clarity and precision.
 
@@ -6,7 +6,7 @@ Distributed systems operate across asynchronous network boundaries. To build rel
 
 ## 1. At-Least-Once Delivery Semantics
 
-StreamForge operates under an **at-least-once** delivery guarantee.
+Agastya operates under an **at-least-once** delivery guarantee.
 
 ```
 [Producer]  ---(Publish: acks=-1)--->  [Apache Kafka]  ---(poll)--->  [Consumer Worker]
@@ -54,9 +54,9 @@ Because duplicate messages are guaranteed to occur in distributed architectures,
         +-------------------------+   +-------------------------+
 ```
 
-### Idempotency in StreamForge:
+### Idempotency in Agastya:
 1. **CloudEvents Unique UUID**: Every event generated via `Event::create()` assigns a unique UUIDv4.
-2. **Deduplicator Contract**: StreamForge checks the event ID against `DeduplicatorInterface` before invoking domain handlers.
+2. **Deduplicator Contract**: Agastya checks the event ID against `DeduplicatorInterface` before invoking domain handlers.
 3. **Database Constraints**: In production applications, handlers should also leverage database unique keys (e.g. `UNIQUE KEY (order_id)`) to enforce atomic idempotency within application transactions.
 
 ---
@@ -65,7 +65,7 @@ Because duplicate messages are guaranteed to occur in distributed architectures,
 
 In Apache Kafka, partition offsets are monotonically increasing 64-bit integers. Committing offset $N$ implicitly marks all offsets $< N$ as acknowledged.
 
-### StreamForge's Guarantees:
+### Agastya's Guarantees:
 - **No Gap Commits**: Offsets are committed strictly after handler completion or after durable delivery to the Dead Letter Queue.
 - **Poison-Pill Resolution**: Fatal non-retryable errors are routed to `{topic}.dlq` before acknowledging the offset, preventing poison pills from stalling partition progress indefinitely while guaranteeing zero message loss.
 - **Graceful Signal Draining**: When `SIGTERM` or `SIGINT` is received, workers finish processing their current record and flush remaining offset commits before the process exits.

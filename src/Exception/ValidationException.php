@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Exception;
+namespace Agastya\Exception;
 
-class ValidationException extends StreamForgeException
+class ValidationException extends AgastyaException
 {
 }

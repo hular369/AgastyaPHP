@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Retry;
+namespace Agastya\Retry;
 
-use StreamForge\Exception\NonRetryableException;
-use StreamForge\Exception\RetriesExhaustedException;
+use Agastya\Exception\NonRetryableException;
+use Agastya\Exception\RetriesExhaustedException;
 use Throwable;
 
 final class RetryEngine

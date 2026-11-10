@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Idempotency;
+namespace Agastya\Idempotency;
 
-use StreamForge\Exception\ValidationException;
+use Agastya\Exception\ValidationException;
 
 final class MemoryDeduplicator implements DeduplicatorInterface
 {

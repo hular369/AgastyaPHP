@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Consumer;
+namespace Agastya\Consumer;
 
-use StreamForge\Event\Event;
-use StreamForge\Exception\StreamForgeException;
+use Agastya\Event\Event;
+use Agastya\Exception\AgastyaException;
 
 final class HandlerRegistry
 {
@@ -16,7 +16,7 @@ final class HandlerRegistry
     public function register(string $eventType, HandlerInterface $handler): self
     {
         if (trim($eventType) === '') {
-            throw new StreamForgeException('Event type cannot be empty.');
+            throw new AgastyaException('Event type cannot be empty.');
         }
 
         $this->handlers[$eventType] = $handler;

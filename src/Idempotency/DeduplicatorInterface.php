@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Idempotency;
+namespace Agastya\Idempotency;
 
 interface DeduplicatorInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Producer;
+namespace Agastya\Producer;
 
 final class InMemoryKafkaClient implements KafkaClientInterface
 {

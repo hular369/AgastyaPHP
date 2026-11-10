@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Retry;
+namespace Agastya\Retry;
 
 final readonly class RetryPolicy
 {

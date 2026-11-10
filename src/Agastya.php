@@ -2,32 +2,32 @@
 
 declare(strict_types=1);
 
-namespace StreamForge;
+namespace Agastya;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use StreamForge\Consumer\Consumer;
-use StreamForge\Consumer\ConsumerClientInterface;
-use StreamForge\Consumer\HandlerInterface;
-use StreamForge\Consumer\HandlerRegistry;
-use StreamForge\Consumer\LonglangConsumerClient;
-use StreamForge\Consumer\WorkerSupervisor;
-use StreamForge\Dlq\DlqPublisher;
-use StreamForge\Dlq\DlqPublisherInterface;
-use StreamForge\Event\Event;
-use StreamForge\Idempotency\DeduplicatorInterface;
-use StreamForge\Idempotency\MemoryDeduplicator;
-use StreamForge\Observability\Metrics;
-use StreamForge\Producer\KafkaClientInterface;
-use StreamForge\Producer\LonglangKafkaClient;
-use StreamForge\Producer\Producer;
-use StreamForge\Producer\ProducerInterface;
-use StreamForge\Retry\RetryPolicy;
+use Agastya\Consumer\Consumer;
+use Agastya\Consumer\ConsumerClientInterface;
+use Agastya\Consumer\HandlerInterface;
+use Agastya\Consumer\HandlerRegistry;
+use Agastya\Consumer\LonglangConsumerClient;
+use Agastya\Consumer\WorkerSupervisor;
+use Agastya\Dlq\DlqPublisher;
+use Agastya\Dlq\DlqPublisherInterface;
+use Agastya\Event\Event;
+use Agastya\Idempotency\DeduplicatorInterface;
+use Agastya\Idempotency\MemoryDeduplicator;
+use Agastya\Observability\Metrics;
+use Agastya\Producer\KafkaClientInterface;
+use Agastya\Producer\LonglangKafkaClient;
+use Agastya\Producer\Producer;
+use Agastya\Producer\ProducerInterface;
+use Agastya\Retry\RetryPolicy;
 
 /**
- * Public facade and factory for StreamForge event processing.
+ * Public facade and factory for Agastya event processing.
  */
-final class StreamForge
+final class Agastya
 {
     private HandlerRegistry $registry;
     private Metrics $metrics;
@@ -75,7 +75,7 @@ final class StreamForge
         ?LoggerInterface $logger = null
     ): ProducerInterface {
         $brokers = $config['brokers'] ?? ['127.0.0.1:9092'];
-        $clientId = $config['client_id'] ?? 'streamforge-php-producer';
+        $clientId = $config['client_id'] ?? 'agastya-php-producer';
 
         $kafkaClient = $client ?? new LonglangKafkaClient($brokers, $clientId, $logger);
         return new Producer($kafkaClient, $metrics, $logger);
@@ -102,9 +102,9 @@ final class StreamForge
     public function createConsumer(?ConsumerClientInterface $client = null): Consumer
     {
         $brokers = $this->config['brokers'] ?? ['127.0.0.1:9092'];
-        $groupId = $this->config['group_id'] ?? 'streamforge-php-group';
-        $topics = $this->config['topics'] ?? ['streamforge.events'];
-        $clientId = $this->config['client_id'] ?? 'streamforge-php-consumer';
+        $groupId = $this->config['group_id'] ?? 'agastya-php-group';
+        $topics = $this->config['topics'] ?? ['agastya.events'];
+        $clientId = $this->config['client_id'] ?? 'agastya-php-consumer';
 
         $consumerClient = $client ?? new LonglangConsumerClient(
             bootstrapServers: $brokers,
@@ -128,7 +128,7 @@ final class StreamForge
     public function run(): void
     {
         $workers = (int) ($this->config['workers'] ?? 1);
-        $groupId = $this->config['group_id'] ?? 'streamforge-php-group';
+        $groupId = $this->config['group_id'] ?? 'agastya-php-group';
 
         if ($workers > 1 && function_exists('pcntl_fork')) {
             $supervisor = new WorkerSupervisor(
@@ -181,7 +181,7 @@ final class StreamForge
         $enableDlq = $this->config['dlq'] ?? true;
         if ($enableDlq) {
             $brokers = $this->config['brokers'] ?? ['127.0.0.1:9092'];
-            $clientId = ($this->config['client_id'] ?? 'streamforge-php') . '-dlq-producer';
+            $clientId = ($this->config['client_id'] ?? 'agastya-php') . '-dlq-producer';
 
             $client = new LonglangKafkaClient($brokers, $clientId, $this->logger);
             $this->dlqProducer = new Producer($client, $this->metrics, $this->logger);
@@ -190,7 +190,7 @@ final class StreamForge
                 function (string $topic, ?string $key, string $payload, array $headers): void {
                     $dlqEvent = Event::create(
                         type: 'dlq.envelope',
-                        source: 'streamforge.dlq',
+                        source: 'agastya.dlq',
                         data: json_decode($payload, true, 512, JSON_THROW_ON_ERROR),
                         key: $key,
                         metadata: $headers

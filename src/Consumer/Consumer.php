@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Consumer;
+namespace Agastya\Consumer;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use StreamForge\Dlq\DlqEnvelope;
-use StreamForge\Dlq\DlqPublisherInterface;
-use StreamForge\Event\Event;
-use StreamForge\Exception\NonRetryableException;
-use StreamForge\Exception\RetriesExhaustedException;
-use StreamForge\Exception\ValidationException;
-use StreamForge\Idempotency\DeduplicatorInterface;
-use StreamForge\Observability\Metrics;
-use StreamForge\Retry\RetryEngine;
-use StreamForge\Retry\RetryPolicy;
+use Agastya\Dlq\DlqEnvelope;
+use Agastya\Dlq\DlqPublisherInterface;
+use Agastya\Event\Event;
+use Agastya\Exception\NonRetryableException;
+use Agastya\Exception\RetriesExhaustedException;
+use Agastya\Exception\ValidationException;
+use Agastya\Idempotency\DeduplicatorInterface;
+use Agastya\Observability\Metrics;
+use Agastya\Retry\RetryEngine;
+use Agastya\Retry\RetryPolicy;
 use Throwable;
 
 final class Consumer
@@ -47,7 +47,7 @@ final class Consumer
     public function run(?callable $stopCheck = null): void
     {
         $this->running = true;
-        $this->logger->info('Starting StreamForge consumer loop...');
+        $this->logger->info('Starting Agastya consumer loop...');
 
         while ($this->running) {
             // Dispatch pending POSIX signals if pcntl is enabled
@@ -78,7 +78,7 @@ final class Consumer
     }
 
     /**
-     * Processes a single Kafka record through the complete StreamForge operational pipeline.
+     * Processes a single Kafka record through the complete Agastya operational pipeline.
      */
     public function processRecord(Record $record): bool
     {
@@ -101,7 +101,7 @@ final class Consumer
             if ($this->dlqPublisher !== null) {
                 $fallbackEvent = Event::create(
                     type: 'malformed.event',
-                    source: 'streamforge.consumer',
+                    source: 'agastya.consumer',
                     data: ['raw_value' => $record->value]
                 );
 

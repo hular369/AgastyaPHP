@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Observability;
+namespace Agastya\Observability;
 
 use Prometheus\CollectorRegistry;
 use Prometheus\Counter;
@@ -26,21 +26,21 @@ final class Metrics
         $this->registry = $registry ?? new CollectorRegistry(new InMemory());
 
         $this->eventsPublishedTotal = $this->registry->getOrRegisterCounter(
-            'streamforge',
+            'agastya',
             'events_published_total',
             'Total count of published events',
             ['topic', 'status']
         );
 
         $this->eventsConsumedTotal = $this->registry->getOrRegisterCounter(
-            'streamforge',
+            'agastya',
             'events_consumed_total',
             'Total count of consumed events',
             ['topic', 'status']
         );
 
         $this->eventProcessingDuration = $this->registry->getOrRegisterHistogram(
-            'streamforge',
+            'agastya',
             'event_processing_duration_seconds',
             'Duration of event handler execution in seconds',
             ['topic', 'event_type'],
@@ -48,21 +48,21 @@ final class Metrics
         );
 
         $this->eventRetriesTotal = $this->registry->getOrRegisterCounter(
-            'streamforge',
+            'agastya',
             'event_retries_total',
             'Total count of transient failure retry attempts',
             ['topic', 'event_type']
         );
 
         $this->dlqEventsTotal = $this->registry->getOrRegisterCounter(
-            'streamforge',
+            'agastya',
             'dlq_events_total',
             'Total count of messages routed to the Dead Letter Queue',
             ['topic', 'reason']
         );
 
         $this->activeWorkers = $this->registry->getOrRegisterGauge(
-            'streamforge',
+            'agastya',
             'active_workers',
             'Current count of active worker processes',
             ['consumer_group']

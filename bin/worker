@@ -5,24 +5,24 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use StreamForge\Event\Event;
-use StreamForge\Exception\NonRetryableException;
-use StreamForge\StreamForge;
+use Agastya\Event\Event;
+use Agastya\Exception\NonRetryableException;
+use Agastya\Agastya;
 
 $brokers = explode(',', getenv('KAFKA_BROKERS') ?: '127.0.0.1:9092');
-$groupId = getenv('KAFKA_GROUP_ID') ?: 'streamforge-php-workers';
+$groupId = getenv('KAFKA_GROUP_ID') ?: 'agastya-php-workers';
 $topics = explode(',', getenv('KAFKA_TOPICS') ?: 'orders.v1,payments.v1,inventory.v1');
 $workerCount = (int) (getenv('WORKER_COUNT') ?: 4);
 
 echo "================================================================================\n";
-echo "                     STREAMFORGE PHP WORKER DAEMON                              \n";
+echo "                     AGASTYA PHP WORKER DAEMON                              \n";
 echo "================================================================================\n";
 echo "• Brokers: " . implode(', ', $brokers) . "\n";
 echo "• Group ID: {$groupId}\n";
 echo "• Topics: " . implode(', ', $topics) . "\n";
 echo "• Workers: {$workerCount}\n\n";
 
-$engine = StreamForge::create([
+$engine = Agastya::create([
     'brokers' => $brokers,
     'group_id' => $groupId,
     'topics' => $topics,

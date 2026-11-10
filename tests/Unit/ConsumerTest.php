@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace StreamForge\Tests\Unit;
+namespace Agastya\Tests\Unit;
 
 use Exception;
-use StreamForge\Consumer\Consumer;
-use StreamForge\Consumer\HandlerRegistry;
-use StreamForge\Consumer\InMemoryConsumerClient;
-use StreamForge\Consumer\Record;
-use StreamForge\Dlq\DlqEnvelope;
-use StreamForge\Dlq\DlqPublisherInterface;
-use StreamForge\Event\Event;
-use StreamForge\Exception\NonRetryableException;
-use StreamForge\Idempotency\MemoryDeduplicator;
-use StreamForge\Observability\Metrics;
-use StreamForge\Retry\RetryPolicy;
+use Agastya\Consumer\Consumer;
+use Agastya\Consumer\HandlerRegistry;
+use Agastya\Consumer\InMemoryConsumerClient;
+use Agastya\Consumer\Record;
+use Agastya\Dlq\DlqEnvelope;
+use Agastya\Dlq\DlqPublisherInterface;
+use Agastya\Event\Event;
+use Agastya\Exception\NonRetryableException;
+use Agastya\Idempotency\MemoryDeduplicator;
+use Agastya\Observability\Metrics;
+use Agastya\Retry\RetryPolicy;
 
 final class ConsumerTest
 {
